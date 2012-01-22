@@ -118,7 +118,7 @@
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 #define CONFIG_BOOTCOMMAND	"nand read 50000000 100000 400000;bootm 50000000"
-#define CONFIG_BOOTARGS    	"setenv bootargs noinitrd mem=${mem} console=${cons} init=/init root=/dev/mtdblock4 rootfstype=yaffs2"
+#define CONFIG_BOOTARGS    	"setenv bootargs noinitrd mem=224M console=ttySAC0,115200 init=/init root=/dev/mtdblock4 rootfstype=yaffs2"
 
 /* Command definition */
 #include <config_cmd_default.h>
@@ -172,8 +172,8 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"upuboot=tftp 50000000 u-boot-nand.bin;nand erase 0 80000;nand write 50000000 0 80000;reset\0" \
-    "upkernel=tftp 50000000 zImage;nand erase 100000 700000;nand write 50000000 100000 ${filesize}\0" \
-    "updrecovery=tftp 50000000 zRecovery;nand erase 800000 800000;nand write 50000000 800000 800000\0" \
+    "upkernel=tftp 50000000 uImage;nand erase 100000 700000;nand write 50000000 100000 ${filesize}\0" \
+    "uprecovery=tftp 50000000 uRecovery;nand erase 800000 800000;nand write 50000000 800000 800000\0" \
     "fbparts=0xc0000@0x0(uboot),0x40000@0xc0000(env),0x700000@0x100000(kernel),0x800000@0x800000(recovery)yaffs,0x1f000000@0x1000000(system)yaffs,0x20000000@0x20000000(data)yaffs\0" \
     "mtdparts=mtdparts=nand0:0xc0000@0x0(uboot),0x40000@0xc0000(env),0x700000@0x100000(kernel),0x800000@0x800000(recovery),0x1f000000@0x1000000(system),0x20000000@0x20000000(data)\0" \
     "mtdids=nand0=nand0\0" \
@@ -181,7 +181,7 @@
     "setinitrdargs=setenv bootargs mem=${mem} console=${cons} rdinit=/linuxrc\0" \
     "initrdtftpboot=run setinitrdargs;tftp 50000000 zRecovery;bootm 50000000\0" \
     "recoveryboot=run setinitrdargs;nand read 50000000 800000 800000;bootm 50000000\0" \
-    "bbtftpboot=run setinitrdargs;tftp 50000000 zImagebb;bootm 50000000\0" \
+    "bbtftpboot=run setinitrdargs;tftp 50000000 uImagebb;bootm 50000000\0" \
 	"cons=ttySAC0,115200\0" \
 	"mem=224M\0"
 
@@ -221,5 +221,8 @@
 #define CONFIG_FASTBOOT_PRODUCT_NAME	"S3C6410"
 #define CONFIG_FASTBOOT_SERIAL		"R6410"
 
+
+// Added upd command to update uboot
+#define CONFIG_CMD_UPUBOOT
 
 #endif	/* __CONFIG_H */
