@@ -36,11 +36,11 @@
 #define TX_ENDPOINT_MAXIMUM_PACKET_SIZE      (0x0040)
 
 static struct usb_string def_usb_fb_strings[] = {
-	{ FB_STR_PRODUCT_IDX,		"Default Product" },
-	{ FB_STR_SERIAL_IDX,		"1234567890" },
+	{ FB_STR_PRODUCT_IDX,		CONFIG_FASTBOOT_PRODUCT_NAME },
+	{ FB_STR_SERIAL_IDX,		CONFIG_FASTBOOT_SERIAL },
 	{ FB_STR_CONFIG_IDX,		"Android Fastboot" },
 	{ FB_STR_INTERFACE_IDX,		"Android Fastboot" },
-	{ FB_STR_MANUFACTURER_IDX,	"Default Manufacturer" },
+	{ FB_STR_MANUFACTURER_IDX,	CONFIG_FASTBOOT_MANUFACTURER },
 	{ FB_STR_PROC_REV_IDX,		"Default 1.0" },
 	{ FB_STR_PROC_TYPE_IDX,		"Emulator" },
 	{  }
@@ -161,8 +161,6 @@ static void fastboot_unbind(struct usb_gadget *gadget)
 }
 
 /* This is the TI USB vendor id a product ID from TI's internal tree */
-#define DEVICE_VENDOR_ID  0x0451
-#define DEVICE_PRODUCT_ID 0xd022
 #define DEVICE_BCD        0x0100
 
 struct usb_device_descriptor fb_descriptor = {
@@ -170,8 +168,8 @@ struct usb_device_descriptor fb_descriptor = {
 	.bDescriptorType    = USB_DT_DEVICE,
 	.bcdUSB             = 0x200,
 	.bMaxPacketSize0    = 0x40,
-	.idVendor           = DEVICE_VENDOR_ID,
-	.idProduct          = DEVICE_PRODUCT_ID,
+	.idVendor           = CONFIG_FASTBOOT_VENDORID,
+	.idProduct          = CONFIG_FASTBOOT_PRODUCTID,
 	.bcdDevice          = DEVICE_BCD,
 	.iManufacturer      = FB_STR_MANUFACTURER_IDX,
 	.iProduct           = FB_STR_PRODUCT_IDX,
