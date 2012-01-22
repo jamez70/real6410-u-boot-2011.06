@@ -1,0 +1,1 @@
+/home/devel/real6410/u-boot-2011.06/arch/arm/cpu/arm1176/s3c64xx/cpu_init.S

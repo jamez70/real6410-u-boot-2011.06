@@ -1,0 +1,1 @@
+/home/devel/real6410/u-boot-2011.06/nand_spl/nand_boot_s3c.c

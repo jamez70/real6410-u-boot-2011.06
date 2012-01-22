@@ -1,0 +1,1 @@
+/home/devel/real6410/u-boot-2011.06/board/samsung/smdk6400/smdk6400_nand_spl.c
