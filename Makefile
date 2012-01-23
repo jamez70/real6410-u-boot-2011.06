@@ -1062,24 +1062,24 @@ mini6410_config :	unconfig
 	@$(MKCONFIG) mini6410 arm arm1176 mini6410 samsung s3c64xx
 	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
 
-real6410_noUSB_config   \
+#real6410_noUSB_config   \
 real6410_config :	unconfig
-	@mkdir -p $(obj)include $(obj)board/samsung/real6410
-	@mkdir -p $(obj)nand_spl/board/samsung/real6410
-	@echo "#define CONFIG_NAND_U_BOOT" > $(obj)include/config.h
-	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
-	@if [ -z "$(findstring real6410_noUSB_config,$@)" ]; then			\
+#	@mkdir -p $(obj)include $(obj)board/samsung/real6410
+#	@mkdir -p $(obj)nand_spl/board/samsung/real6410
+#	@echo "#define CONFIG_NAND_U_BOOT" > $(obj)include/config.h
+#	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
+#	@if [ -z "$(findstring real6410_noUSB_config,$@)" ]; then			\
 		echo "RAM_TEXT = 0x5fe00000" >> $(obj)board/samsung/real6410/config.tmp;\
 	else										\
 		echo "RAM_TEXT = 0xcfe00000" >> $(obj)board/samsung/real6410/config.tmp;\
 	fi
-	@$(MKCONFIG) real6410 arm arm1176 real6410 samsung s3c64xx
-	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
+#	@$(MKCONFIG) real6410 arm arm1176 real6410 samsung s3c64xx
+#	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
 
 
-#mini6410_config :	unconfig
-#	@mkdir -p $(obj)include
-#	@$(MKCONFIG) mini6410 arm arm1176 mini6410 friendly_arm s3c64xx
+real6410_config :	unconfig
+	@mkdir -p $(obj)include
+	@$(MKCONFIG) real6410 arm arm1176 real6410 real6410 s3c64xx
 
 #========================================================================
 # Nios
