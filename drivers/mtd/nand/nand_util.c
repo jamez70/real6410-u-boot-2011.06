@@ -464,6 +464,7 @@ int nand_write_skip_bad(nand_info_t *nand, loff_t offset, size_t *length,
 		int pages;
 		pages = nand->erasesize / nand->writesize;
 		blocksize = (pages * nand->oobsize) + nand->erasesize;
+		printf("erasesize %d, writesize %d, oobsize %d, length %d\n",nand->erasesize,nand->writesize,nand->oobsize,*length);
 		if (*length % (nand->writesize + nand->oobsize)) {
 			printf ("Attempt to write incomplete page"
 				" in yaffs mode\n");
@@ -493,13 +494,14 @@ int nand_write_skip_bad(nand_info_t *nand, loff_t offset, size_t *length,
 	}
 
 	need_skip = check_skip_len(nand, offset, *length);
+	printf("need skip returned %d\n",need_skip);
 	if (need_skip < 0) {
 		printf ("Attempt to write outside the flash area\n");
 		*length = 0;
 		return -EINVAL;
 	}
 
-	if (!need_skip) {
+	if ((!(need_skip)) && (withoob==0)) {
 		rval = nand_write (nand, offset, length, buffer);
 		if (rval == 0)
 			return 0;
@@ -509,7 +511,7 @@ int nand_write_skip_bad(nand_info_t *nand, loff_t offset, size_t *length,
 			offset, rval);
 		return rval;
 	}
-
+	printf("Writing YAFFS partition\n");
 	while (left_to_write > 0) {
 		size_t block_offset = offset & (nand->erasesize - 1);
 		size_t write_size;
@@ -527,7 +529,6 @@ int nand_write_skip_bad(nand_info_t *nand, loff_t offset, size_t *length,
 			write_size = left_to_write;
 		else
 			write_size = blocksize - block_offset;
-
 #ifdef CONFIG_CMD_NAND_YAFFS
 		if (withoob) {
 			int page, pages;
@@ -539,16 +540,14 @@ int nand_write_skip_bad(nand_info_t *nand, loff_t offset, size_t *length,
 			ops.ooblen = nand->oobsize;
 			ops.mode = MTD_OOB_AUTO;
 			ops.ooboffs = 0;
-
 			pages = write_size / pagesize_oob;
 			for (page = 0; page < pages; page++) {
 				WATCHDOG_RESET();
 
 				ops.datbuf = p_buffer;
 				ops.oobbuf = ops.datbuf + pagesize;
-
 				rval = nand->write_oob(nand, offset, &ops);
-				if (!rval)
+				if (rval!=0)
 					break;
 
 				offset += pagesize;
@@ -569,10 +568,10 @@ int nand_write_skip_bad(nand_info_t *nand, loff_t offset, size_t *length,
 			*length -= left_to_write;
 			return rval;
 		}
-
+		printf(".");
 		left_to_write -= write_size;
 	}
-
+	printf("\n");
 	return 0;
 }
 

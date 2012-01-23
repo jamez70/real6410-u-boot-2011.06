@@ -371,6 +371,7 @@ static void nand_print_info(int idx)
 		printf("%dx ", chip->numchips);
 	printf("%s, sector size %u KiB\n",
 	       nand->name, nand->erasesize >> 10);
+	printf("write size %d erase size %d OOB size %d\n",nand->writesize,nand->erasesize,nand->oobsize);
 }
 
 int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])

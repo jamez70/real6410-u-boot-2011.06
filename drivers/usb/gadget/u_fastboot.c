@@ -76,13 +76,14 @@ int static_pcount = -1;
 int quitThis = 0;
 static unsigned int download_size;
 static unsigned int download_bytes;
+static unsigned int download_bytes_unpadded;
 
 static struct cmd_fastboot_interface interface = {
-	.product_name          = "real6410",
-	.serial_no             = "0123456789",
-	.nand_block_size       = 262144,
-	.transfer_buffer       = (unsigned char *)0x50000000,
-	.transfer_buffer_size  = 0x10000000,
+	.product_name          = CONFIG_FASTBOOT_PRODUCT_NAME,
+	.serial_no             = CONFIG_FASTBOOT_SERIAL,
+	.nand_block_size       = FASTBOOT_NAND_BLOCK_SIZE,
+	.transfer_buffer       = CONFIG_FASTBOOT_TRANSFER_BUFFER,
+	.transfer_buffer_size  = CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE,
 };
 
 extern int setenv(char *varname, char *varvalue);
@@ -254,7 +255,7 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 	/* Which flavor of write to use */
 	if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_I)
 		sprintf(write_type, "write.i");
-#ifdef CFG_NAND_YAFFS_WRITE
+#ifdef CONFIG_CMD_NAND_YAFFS 
 	else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_YAFFS)
 		sprintf(write_type, "write.yaffs");
 #endif
@@ -301,7 +302,6 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 			   FASTBOOT_PTENTRY_FLAGS_WRITE_NEXT_GOOD_BLOCK) {
 			/* Keep writing until you get a good block
 			   transfer_buffer should already be aligned */
-#if 0
 			if (interface.nand_block_size) {
 				unsigned int blocks = download_bytes /
 					interface.nand_block_size;
@@ -340,7 +340,6 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 					partition '%s'\n", ptn->name);
 				printf("Ignoring write request\n");
 			}
-#endif
 		} else if (ptn->flags &
 			 FASTBOOT_PTENTRY_FLAGS_WRITE_CONTIGUOUS_BLOCK) {
 			/* Keep writing until you get a good block
@@ -423,7 +422,7 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 			sprintf(wstart,  "0x%x", ptn->start +
 				(repeat * ptn->length));
 			sprintf(wlength, "0x%x", download_bytes);
-#ifdef CFG_NAND_YAFFS_WRITE
+#ifdef CONFIG_CMD_NAND_YAFFS
 			if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_YAFFS)
 				sprintf(wlength, "0x%x",
 					download_bytes_unpadded);
@@ -571,7 +570,7 @@ static void rx_handler_dl_image(struct usb_ep *ep, struct usb_request *req)
 		download_size = 0;
 		req->complete = rx_handler_command;
 		req->length = EP_BUFFER_SIZE;
-
+		download_bytes_unpadded = download_bytes;
 		sprintf(response, "OKAY");
 		fastboot_tx_write_str(response);
 

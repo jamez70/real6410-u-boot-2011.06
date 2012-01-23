@@ -52,7 +52,7 @@
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_SDRAM_BASE	/* default load address	*/
 #define CONFIG_LOADADDR 			0x50000000
 
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 1024 * 1024)
+#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 1024 * 1024 * 2)
 #define CONFIG_SYS_UBOOT_BASE		CONFIG_SYS_TEXT_BASE
 #define CONFIG_SYS_UBOOT_SIZE		(1024 * 1024 * 2)
 
@@ -117,7 +117,7 @@
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
-#define CONFIG_BOOTCOMMAND	"nand read 50000000 100000 400000;bootm 50000000"
+#define CONFIG_BOOTCOMMAND	"nand read ${loadaddr} kernel;bootm ${loadaddr}"
 #define CONFIG_BOOTARGS    	"setenv bootargs noinitrd mem=224M console=ttySAC0,115200 init=/init root=/dev/mtdblock4 rootfstype=yaffs2"
 
 /* Command definition */
@@ -138,16 +138,47 @@
 #define CONFIG_CMD_SAVEENV
 
 /* NAND configuration */
+#define CONFIG_MTD_DEBUG
+#define CONFIG_MTD_DEBUG_VERBOSE 1
+
+/* NAND chip page size		*/
+#define CONFIG_SYS_NAND_PAGE_SIZE	2048
+/* NAND chip block size		*/
+#define CONFIG_SYS_NAND_BLOCK_SIZE	(256 * 1024)
+/* NAND chip page per block count  */
+#define CONFIG_SYS_NAND_PAGE_COUNT	64
+/* Location of the bad-block label */
+#define CONFIG_SYS_NAND_BAD_BLOCK_POS	0
+/* Extra address cycle for > 128MiB */
+#define CONFIG_SYS_NAND_5_ADDR_CYCLE
+
+/* Size of the block protected by one OOB (Spare Area in Samsung terminology) */
+#define CONFIG_SYS_NAND_ECCSIZE	CONFIG_SYS_NAND_PAGE_SIZE
+/* Number of ECC bytes per OOB - S3C6400 calculates 4 bytes ECC in 1-bit mode */
+#define CONFIG_SYS_NAND_ECCBYTES	4
+/* Number of ECC-blocks per NAND page */
+#define CONFIG_SYS_NAND_ECCSTEPS	(CONFIG_SYS_NAND_PAGE_SIZE / CONFIG_SYS_NAND_ECCSIZE)
+/* Size of a single OOB region */
+#define CONFIG_SYS_NAND_OOBSIZE	64
+/* Number of ECC bytes per page */
+#define CONFIG_SYS_NAND_ECCTOTAL	(CONFIG_SYS_NAND_ECCBYTES * CONFIG_SYS_NAND_ECCSTEPS)
+/* ECC byte positions */
+#define CONFIG_SYS_NAND_ECCPOS		{40, 41, 42, 43, 44, 45, 46, 47, \
+				 48, 49, 50, 51, 52, 53, 54, 55, \
+				 56, 57, 58, 59, 60, 61, 62, 63}
+
+#define CONFIG_SYS_S3C_NAND_HWECC
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		0x70200010
 #define CONFIG_BOOT_NAND
 #define CONFIG_NAND
 #define CONFIG_NAND_S3C64XX
 #define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
 
-#define CONFIG_SYS_NAND_PAGE_SIZE	(2 * 1024)
-#define CONFIG_SYS_NAND_PAGE_COUNT	64
-#define CONFIG_SYS_NAND_BLOCK_SIZE	(CONFIG_SYS_NAND_PAGE_SIZE * CONFIG_SYS_NAND_PAGE_COUNT)
+//#define CONFIG_SYS_NAND_PAGE_SIZE	(2 * 1024)
+//#define CONFIG_SYS_NAND_PAGE_COUNT	64
+//#define CONFIG_SYS_NAND_BLOCK_SIZE	(CONFIG_SYS_NAND_PAGE_SIZE * CONFIG_SYS_NAND_PAGE_COUNT)
 
 #define CONFIG_SYS_NAND_U_BOOT_DST	0x5fc00000
 #define CONFIG_SYS_NAND_U_BOOT_START	CONFIG_SYS_NAND_U_BOOT_DST
@@ -157,7 +188,12 @@
 
 #define CONFIG_DOS_PARTITION	1
 
+#define CONFIG_RBTREE
 #define CONFIG_YAFFS2
+#define CONFIG_YAFFS_NO_YAFFS1
+#define YAFFS_CHUNKS_PER_BLOCK 128
+#define YAFFS_BYTES_PER_CHUNK 2048
+#define YAFFS_BYTES_PER_SPARE 64
 
 
 
@@ -171,17 +207,23 @@
 //#define CONFIG_USB_CDC
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"upuboot=tftp 50000000 u-boot-nand.bin;nand erase 0 80000;nand write 50000000 0 80000;reset\0" \
-    "upkernel=tftp 50000000 uImage;nand erase 100000 700000;nand write 50000000 100000 ${filesize}\0" \
-    "uprecovery=tftp 50000000 uRecovery;nand erase 800000 800000;nand write 50000000 800000 800000\0" \
+	"upuboot=tftp ${loadaddr} u-boot-nand.bin;nand erase 0 80000;nand write ${loadaddr} 0 80000;reset\0" \
+    "upkernel=tftp ${loadaddr} uImage;nand erase.part kernel;nand write ${loadaddr} kernel\0" \
+    "uprecovery=tftp ${loadaddr} uRecovery;nand erase.part recovery;nand write ${loadaddr} recovery\0" \
     "fbparts=0xc0000@0x0(uboot),0x40000@0xc0000(env),0x700000@0x100000(kernel),0x800000@0x800000(recovery)yaffs,0x1f000000@0x1000000(system)yaffs,0x20000000@0x20000000(data)yaffs\0" \
     "mtdparts=mtdparts=nand0:0xc0000@0x0(uboot),0x40000@0xc0000(env),0x700000@0x100000(kernel),0x800000@0x800000(recovery),0x1f000000@0x1000000(system),0x20000000@0x20000000(data)\0" \
     "mtdids=nand0=nand0\0" \
-    "setnfsargs=setenv bootargs noinitrd mem=${mem} console=${cons} init=/init root=/dev/nfs nfsroot=192.168.0.2:/home/devel/real6410/root_mkfs,nfsvers=3 ip=192.168.0.91:192.168.0.2:192.168.0.1:255.255.255.0:real6410:eth0:off video=fb:WX4300F\0" \
+	"video=video=fb:WX4300F\0" \
+	"rootdevnand=root=/dev/mtdblock4 rootfstype=yaffs2\0" \
+	"nfsroot=/home/devel/real6410/root_mkfs,nfsvers=3\0" \
+	"ip=ip=192.168.0.91:192.168.0.2:192.168.0.1:255.255.255.0:real6410:eth0:off\0" \
+	"rootdevnfs=root=/dev/nfs nfsroot=${serverip}:${nfsroot}rootfstype=yaffs2\0" \
+    "setnfsargs=setenv bootargs noinitrd mem=${mem} console=${cons} init=/init root=/dev/nfs nfsroot=${serverip}:${nfsroot} ${ip} ${video}\0" \
     "setinitrdargs=setenv bootargs mem=${mem} console=${cons} rdinit=/linuxrc\0" \
-    "initrdtftpboot=run setinitrdargs;tftp 50000000 zRecovery;bootm 50000000\0" \
-    "recoveryboot=run setinitrdargs;nand read 50000000 800000 800000;bootm 50000000\0" \
-    "bbtftpboot=run setinitrdargs;tftp 50000000 uImagebb;bootm 50000000\0" \
+	"setnandargs=setenv bootargs noinitrd mem=${mem} console=${cons} init=/init ${rootdevnand}\0" \
+    "initrdtftpboot=run setinitrdargs;tftp ${loadaddr} zRecovery;bootm ${loadaddr}\0" \
+    "recoveryboot=run setinitrdargs;nand read ${loadaddr} recovery;bootm ${loadaddr}\0" \
+    "bbtftpboot=run setinitrdargs;tftp ${loadaddr} uImagebb;bootm ${loadaddr}\0" \
 	"cons=ttySAC0,115200\0" \
 	"mem=224M\0"
 
@@ -199,13 +241,11 @@
  * where fastboot is started at boot (to be incorporated) based on key press
  */
 #define	CONFIG_CMD_FASTBOOT
-#define	CONFIG_FASTBOOT_TRANSFER_BUFFER		(PHYS_SDRAM_1 + SZ_16M)
-#define	CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE	(SZ_128M - SZ_16M)
+#define	CONFIG_FASTBOOT_TRANSFER_BUFFER		((unsigned char *)0x50000000)
+#define	CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE	(0x0F000000)
 /* if already present, use already existing NAND macros for block & oob size */
 #define	FASTBOOT_NAND_BLOCK_SIZE		2048
 #define	FASTBOOT_NAND_OOB_SIZE			64
-/* Fastboot product name */
-#define	FASTBOOT_PRODUCT_NAME	"omap3evm"
 
 
 #endif /* CONFIG_FASTBOOT */
@@ -215,7 +255,7 @@
 //#define CONFIG_USB_TTY			1
 //#define CONFIG_SYS_CONSOLE_IS_IN_ENV	1
 /* Change these to suit your needs */
-#define CONFIG_FASTBOOT_VENDORID		0x04e8
+#define CONFIG_FASTBOOT_VENDORID		0x0bb4
 #define CONFIG_FASTBOOT_PRODUCTID		0x0c01
 #define CONFIG_FASTBOOT_MANUFACTURER	"Samsung"
 #define CONFIG_FASTBOOT_PRODUCT_NAME	"S3C6410"

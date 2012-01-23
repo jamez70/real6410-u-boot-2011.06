@@ -45,6 +45,8 @@
 #define YAFFS_CHUNK_SIZE_SHIFT		9
 #define YAFFS_CHUNKS_PER_BLOCK		32
 #define YAFFS_BYTES_PER_BLOCK		(YAFFS_CHUNKS_PER_BLOCK*YAFFS_BYTES_PER_CHUNK)
+#else
+
 #endif
 
 #define YAFFS_MIN_YAFFS2_CHUNK_SIZE 	1024
@@ -130,7 +132,6 @@ typedef struct {
  * the structure size will get blown out.
  */
 
-#ifndef CONFIG_YAFFS_NO_YAFFS1
 typedef struct {
 	unsigned chunkId:20;
 	unsigned serialNumber:2;
@@ -146,7 +147,6 @@ typedef union {
 	__u8 asBytes[8];
 } yaffs_TagsUnion;
 
-#endif
 
 /* Stuff used for extended tags in YAFFS2 */
 
