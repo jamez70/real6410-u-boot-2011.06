@@ -1,1 +1,0 @@
-/home/devel/real6410/u-boot-2011.06/arch/arm/cpu/arm1176/start.S

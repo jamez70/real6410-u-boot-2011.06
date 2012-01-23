@@ -1,1 +1,0 @@
-/home/devel/real6410/u-boot-2011.06/board/friendly_arm/mini6410/lowlevel_init.S

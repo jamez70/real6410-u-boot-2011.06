@@ -1,1 +1,0 @@
-/home/devel/real6410/u-boot-2011.06/drivers/mtd/nand/nand_ecc.c
