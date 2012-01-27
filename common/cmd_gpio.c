@@ -9,7 +9,7 @@
 #include <common.h>
 #include <command.h>
 
-#include <asm/gpio.h>
+#include <asm/arch/gpio.h>
 
 #ifndef name_to_gpio
 #define name_to_gpio(name) simple_strtoul(name, NULL, 10)

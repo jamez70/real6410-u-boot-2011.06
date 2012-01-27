@@ -22,118 +22,54 @@
 #define __ASM_ARCH_GPIO_H
 
 #ifndef __ASSEMBLY__
-struct s5p_gpio_bank {
+struct s3c_gpio_bank1 {
 	unsigned int	con;
 	unsigned int	dat;
 	unsigned int	pull;
-	unsigned int	drv;
-	unsigned int	pdn_con;
-	unsigned int	pdn_pull;
-	unsigned char	res1[8];
+	unsigned int	slp;
+	unsigned int	slp_pull;
+	unsigned char	res1[3];
 };
 
-struct s5pc100_gpio {
-	struct s5p_gpio_bank a0;
-	struct s5p_gpio_bank a1;
-	struct s5p_gpio_bank b;
-	struct s5p_gpio_bank c;
-	struct s5p_gpio_bank d;
-	struct s5p_gpio_bank e0;
-	struct s5p_gpio_bank e1;
-	struct s5p_gpio_bank f0;
-	struct s5p_gpio_bank f1;
-	struct s5p_gpio_bank f2;
-	struct s5p_gpio_bank f3;
-	struct s5p_gpio_bank g0;
-	struct s5p_gpio_bank g1;
-	struct s5p_gpio_bank g2;
-	struct s5p_gpio_bank g3;
-	struct s5p_gpio_bank i;
-	struct s5p_gpio_bank j0;
-	struct s5p_gpio_bank j1;
-	struct s5p_gpio_bank j2;
-	struct s5p_gpio_bank j3;
-	struct s5p_gpio_bank j4;
-	struct s5p_gpio_bank k0;
-	struct s5p_gpio_bank k1;
-	struct s5p_gpio_bank k2;
-	struct s5p_gpio_bank k3;
-	struct s5p_gpio_bank l0;
-	struct s5p_gpio_bank l1;
-	struct s5p_gpio_bank l2;
-	struct s5p_gpio_bank l3;
-	struct s5p_gpio_bank l4;
-	struct s5p_gpio_bank h0;
-	struct s5p_gpio_bank h1;
-	struct s5p_gpio_bank h2;
-	struct s5p_gpio_bank h3;
+struct s3c_gpio_bank2 {
+	unsigned int	con;
+	unsigned int    con2;
+	unsigned int	dat;
+	unsigned int	pull;
+	unsigned int	slp;
+	unsigned int	slp_pull;
+	unsigned char	res1[2];
 };
 
-struct s5pc110_gpio {
-	struct s5p_gpio_bank a0;
-	struct s5p_gpio_bank a1;
-	struct s5p_gpio_bank b;
-	struct s5p_gpio_bank c0;
-	struct s5p_gpio_bank c1;
-	struct s5p_gpio_bank d0;
-	struct s5p_gpio_bank d1;
-	struct s5p_gpio_bank e0;
-	struct s5p_gpio_bank e1;
-	struct s5p_gpio_bank f0;
-	struct s5p_gpio_bank f1;
-	struct s5p_gpio_bank f2;
-	struct s5p_gpio_bank f3;
-	struct s5p_gpio_bank g0;
-	struct s5p_gpio_bank g1;
-	struct s5p_gpio_bank g2;
-	struct s5p_gpio_bank g3;
-	struct s5p_gpio_bank i;
-	struct s5p_gpio_bank j0;
-	struct s5p_gpio_bank j1;
-	struct s5p_gpio_bank j2;
-	struct s5p_gpio_bank j3;
-	struct s5p_gpio_bank j4;
-	struct s5p_gpio_bank mp0_1;
-	struct s5p_gpio_bank mp0_2;
-	struct s5p_gpio_bank mp0_3;
-	struct s5p_gpio_bank mp0_4;
-	struct s5p_gpio_bank mp0_5;
-	struct s5p_gpio_bank mp0_6;
-	struct s5p_gpio_bank mp0_7;
-	struct s5p_gpio_bank mp1_0;
-	struct s5p_gpio_bank mp1_1;
-	struct s5p_gpio_bank mp1_2;
-	struct s5p_gpio_bank mp1_3;
-	struct s5p_gpio_bank mp1_4;
-	struct s5p_gpio_bank mp1_5;
-	struct s5p_gpio_bank mp1_6;
-	struct s5p_gpio_bank mp1_7;
-	struct s5p_gpio_bank mp1_8;
-	struct s5p_gpio_bank mp2_0;
-	struct s5p_gpio_bank mp2_1;
-	struct s5p_gpio_bank mp2_2;
-	struct s5p_gpio_bank mp2_3;
-	struct s5p_gpio_bank mp2_4;
-	struct s5p_gpio_bank mp2_5;
-	struct s5p_gpio_bank mp2_6;
-	struct s5p_gpio_bank mp2_7;
-	struct s5p_gpio_bank mp2_8;
-	struct s5p_gpio_bank res1[48];
-	struct s5p_gpio_bank h0;
-	struct s5p_gpio_bank h1;
-	struct s5p_gpio_bank h2;
-	struct s5p_gpio_bank h3;
+struct s3c_gpio {
+	struct s3c_gpio_bank1 a;
+	struct s3c_gpio_bank1 b;
+	struct s3c_gpio_bank1 c;
+	struct s3c_gpio_bank1 d;
+	struct s3c_gpio_bank1 e; 
+	struct s3c_gpio_bank1 f;
+	struct s3c_gpio_bank1 g;
+	struct s3c_gpio_bank2 h;
+	struct s3c_gpio_bank1 i;
+	struct s3c_gpio_bank1 j;
+	struct s3c_gpio_bank2 k;
+	struct s3c_gpio_bank2 l;
+	struct s3c_gpio_bank1 m;
+	struct s3c_gpio_bank1 n;
+	struct s3c_gpio_bank1 o;
+	struct s3c_gpio_bank1 p;
+	struct s3c_gpio_bank1 q;
 };
 
 /* functions */
-void gpio_cfg_pin(struct s5p_gpio_bank *bank, int gpio, int cfg);
-void gpio_direction_output(struct s5p_gpio_bank *bank, int gpio, int en);
-void gpio_direction_input(struct s5p_gpio_bank *bank, int gpio);
-void gpio_set_value(struct s5p_gpio_bank *bank, int gpio, int en);
-unsigned int gpio_get_value(struct s5p_gpio_bank *bank, int gpio);
-void gpio_set_pull(struct s5p_gpio_bank *bank, int gpio, int mode);
-void gpio_set_drv(struct s5p_gpio_bank *bank, int gpio, int mode);
-void gpio_set_rate(struct s5p_gpio_bank *bank, int gpio, int mode);
+void gpio_cfg_pin(struct s3c_gpio_bank *bank, int gpio, int cfg);
+void gpio_direction_output(struct s3c_gpio_bank *bank, int gpio, int en);
+void gpio_direction_input(struct s3c_gpio_bank *bank, int gpio);
+void gpio_set_value(struct s3c_gpio_bank *bank, int gpio, int en);
+unsigned int gpio_get_value(struct s3c_gpio_bank *bank, int gpio);
+void gpio_set_pull(struct s3c_gpio_bank *bank, int gpio, int mode);
+void gpio_set_drv(struct s3c_gpio_bank *bank, int gpio, int mode);
+void gpio_set_rate(struct s3c_gpio_bank *bank, int gpio, int mode);
 #endif
 
 /* Pin configurations */
@@ -154,5 +90,7 @@ void gpio_set_rate(struct s5p_gpio_bank *bank, int gpio, int mode);
 #define GPIO_DRV_4X	0x3
 #define GPIO_DRV_FAST	0x0
 #define GPIO_DRV_SLOW	0x1
+
+#define S3C_GPIO_BASE 0x7f008000
 
 #endif

@@ -62,6 +62,7 @@ TODO: external MII is not functional, only internal at the moment.
 #include <command.h>
 #include <net.h>
 #include <asm/io.h>
+#include <asm/arch/s3c6400.h>
 #include <dm9000.h>
 
 #include "dm9000x.h"
@@ -242,12 +243,28 @@ dm9000_probe(void)
 	}
 }
 
+void dm9000_hw_reset(void)
+{
+	u32 val;
+	val = readl(GPNCON);
+	val &= ~3;
+	val |= 2;
+	writel(val,GPNCON);
+	val = readl(GPNDAT);
+	val &= ~1;
+	writel(val,GPNDAT);
+	udelay(50000);
+	val |= 1;
+	writel(val,GPNDAT);
+	udelay(50000);
+	
+}
 /* General Purpose dm9000 reset routine */
 static void
 dm9000_reset(void)
 {
 	printf("resetting DM9000\n");
-
+	dm9000_hw_reset();
 	/* Reset DM9000,
 	   see DM9000 Application Notes V1.22 Jun 11, 2004 page 29 */
 

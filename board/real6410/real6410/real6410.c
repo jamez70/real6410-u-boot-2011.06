@@ -25,6 +25,8 @@
 #include <netdev.h>
 #include <asm/arch/s3c6400.h>
 #include <asm/arch/hs_otg.h>
+#include <asm/io.h>
+#include "rlogo.h"
 
 int s3c_udc_probe(struct s3c_plat_otg_data *pdata);
 
@@ -90,6 +92,74 @@ struct s3c_plat_otg_data s3c64xx_otg_data = {
 };
 #endif
 
+void board_gpio_init(void)
+{
+	u32 val;
+	
+	__raw_writel(0,0x7410800c);		// MOFPCON
+	val=readl(0x7f0081a0);
+	val &= ~3;
+	val |= 1;
+	__raw_writel(val,0x7f0081a0);
+	// Set the GPIO for LCD
+	__raw_writel(0xaaaaaaaa,0x7f008100);
+	__raw_writel(0xaaaaaaaa,0x7f008120);
+
+}
+
+#define LCDWRITE(a,b)  __raw_writel(b,a)
+
+void board_lcd_logo(void)
+{
+	unsigned short *src = (unsigned short *)rlogo_bmp;
+	int x,y;
+	unsigned short *scr;
+	
+	for (y=0; y<50; y++)
+	{
+		scr=(unsigned short *)((960*(y+111))+0x5ffc0000+320);
+		for (x=0;x<160; x++)
+		{
+			*scr++=*src++;
+		}
+	}
+	
+}
+
+void board_lcd_init(void)
+{
+	u32 v,i;
+	u32 *p;
+	LCDWRITE(0x77100004,0x00f0c060);
+	LCDWRITE(0x77100010,0x00000000);
+	LCDWRITE(0x77100014,0x00020127);
+	LCDWRITE(0x77100018,0x000879df);
+	LCDWRITE(0x77100020,0x00010015);
+	LCDWRITE(0x77100044,0x000f010f);
+	LCDWRITE(0x77100048,0x0001fe00);
+	LCDWRITE(0x771000a0,CONFIG_LCD_FRAMEBUFFER);
+	LCDWRITE(0x771000a4,CONFIG_LCD_FRAMEBUFFER);
+	LCDWRITE(0x771000d0,0x0043fc00);
+	LCDWRITE(0x771000d4,0x0043fc00);
+	LCDWRITE(0x77100100,0x3c0);
+	LCDWRITE(0x771001a0,0x00000006);
+	LCDWRITE(0x77100130,0x03f00000);
+	LCDWRITE(0x77100100,0x000003c0);
+	LCDWRITE(0x77100140,0x00ffffff);
+	LCDWRITE(0x77100144,0x00ffffff);
+	LCDWRITE(0x77100148,0x00ffffff);
+	LCDWRITE(0x7710014c,0x00ffffff);
+	LCDWRITE(0x77100150,0x00ffffff);
+	LCDWRITE(0x77100154,0x00ffffff);
+	LCDWRITE(0x77100158,0x00ffffff);
+	LCDWRITE(0x7710015c,0x00ffffff);
+	LCDWRITE(0x77100000,0x00000393);	
+	p = (u32 *)(CONFIG_LCD_FRAMEBUFFER);
+	v = 0;
+	for (i=0; i<(272*480/2); i++)
+		*p++ = v;
+	board_lcd_logo();
+}
 
 int board_init(void)
 {
@@ -102,6 +172,8 @@ int board_init(void)
 	DMACConfig4 = 1;
 	gd->bd->bi_arch_number = MACH_TYPE;
 	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
+	board_gpio_init();
+	board_lcd_init();
 	return 0;
 }
 
