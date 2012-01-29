@@ -9,6 +9,9 @@ extern int static_pcount;
 extern int pcount;
 extern int quitThis;
 
+void board_skateboard_logo(void);
+void board_lcd_logo(void);
+
 static int check_against_static_partition(struct fastboot_ptentry *ptn)
 {
 	int ret = 0;
@@ -254,7 +257,7 @@ static int do_fastboot(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 	int ret = 1;
 
 	set_partition_table();
-
+	board_skateboard_logo();
 	if (!fastboot_init()) {
 		printf("Fastboot entered...\n");
 		ret = 0;
@@ -265,12 +268,13 @@ static int do_fastboot(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 			if ((ctrlc()) || (quitThis != 0))
 			{
 				quitThis=0;
+				board_lcd_logo();
 				fastboot_shutdown();
 				return 0;
 			}
 		}
 	}
-
+	board_lcd_logo();
 	fastboot_shutdown();
 	return ret;
 }

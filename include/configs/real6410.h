@@ -146,7 +146,7 @@
 /* NAND chip page size		*/
 #define CONFIG_SYS_NAND_PAGE_SIZE	2048
 /* NAND chip block size		*/
-#define CONFIG_SYS_NAND_BLOCK_SIZE	(256 * 1024)
+#define CONFIG_SYS_NAND_BLOCK_SIZE	(128 * 1024)
 /* NAND chip page per block count  */
 #define CONFIG_SYS_NAND_PAGE_COUNT	64
 /* Location of the bad-block label */
@@ -169,7 +169,7 @@
 				 48, 49, 50, 51, 52, 53, 54, 55, \
 				 56, 57, 58, 59, 60, 61, 62, 63}
 
-#define CONFIG_SYS_S3C_NAND_HWECC
+//#define CONFIG_SYS_S3C_NAND_HWECC
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		0x70200010
 #define CONFIG_BOOT_NAND
@@ -209,6 +209,7 @@
 //#define CONFIG_USB_CDC
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	"bb=run setinitrdargs;tftp ${loadaddr} uImagebb;bootm ${loadaddr}\0" \
 	"upuboot=tftp ${loadaddr} u-boot-nand.bin;nand erase 0 80000;nand write ${loadaddr} 0 80000;reset\0" \
     "upkernel=tftp ${loadaddr} uImage;nand erase.part kernel;nand write ${loadaddr} kernel\0" \
     "uprecovery=tftp ${loadaddr} uRecovery;nand erase.part recovery;nand write ${loadaddr} recovery\0" \
@@ -263,10 +264,11 @@
 #define CONFIG_FASTBOOT_PRODUCT_NAME	"S3C6410"
 #define CONFIG_FASTBOOT_SERIAL		"R6410"
 
-#define CONFIG_LCD_FRAMEBUFFER 0x5ffc0000
+#define CONFIG_LCD_FRAMEBUFFER 0x5fb00000
 //#define CONFIG_LCD
 // Added upd command to update uboot
 #define CONFIG_CMD_UPUBOOT
+#define CONFIG_CMD_READKEY
 
 #define CONFIG_ANDROID_BOOT_IMAGE
 

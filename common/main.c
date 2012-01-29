@@ -325,6 +325,13 @@ void main_loop (void)
 	hush_init_var ();
 #endif
 
+#ifdef CONFIG_CMD_FASTBOOT
+	if (fastboot_preboot() != 0)
+	{
+		run_command("fastboot",0);
+	}
+#endif
+
 #ifdef CONFIG_PREBOOT
 	if ((p = getenv ("preboot")) != NULL) {
 # ifdef CONFIG_AUTOBOOT_KEYED

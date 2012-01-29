@@ -23,9 +23,10 @@
 
 #include <common.h>
 #include <netdev.h>
-#include <asm/arch/s3c6400.h>
+#include <asm/arch/s3c6410.h>
 #include <asm/arch/hs_otg.h>
 #include <asm/io.h>
+#include <skateboard16.h>
 #include "rlogo.h"
 
 int s3c_udc_probe(struct s3c_plat_otg_data *pdata);
@@ -97,27 +98,103 @@ void board_gpio_init(void)
 	u32 val;
 	
 	__raw_writel(0,0x7410800c);		// MOFPCON
-	val=readl(0x7f0081a0);
+	val=SPCON_REG;
 	val &= ~3;
 	val |= 1;
-	__raw_writel(val,0x7f0081a0);
+	SPCON_REG=val;
 	// Set the GPIO for LCD
-	__raw_writel(0xaaaaaaaa,0x7f008100);
-	__raw_writel(0xaaaaaaaa,0x7f008120);
-
+	GPICON_REG=0xaaaaaaaa;
+	GPJCON_REG=0xaaaaaaaa;
+	
+	// Set up keyboard as inputs, GPL 8,9,12
+	GPLCON1_REG = (GPLCON1_REG & 0xfff0ff00);
+	GPNCON_REG = (GPNCON_REG & 0xff03f3c0);
 }
 
 #define LCDWRITE(a,b)  __raw_writel(b,a)
+
+
+u32 board_read_keyboard(void)
+{
+	u32 v1,v2,kb,vmap;
+	u32 keymap[] = {0x100,0x200,0x1000,0x10000,0x20000,0x40000,0x200000,0x2000000,0x4000000,0x8000000};
+	v1=GPLDAT_REG;
+	v2=GPNDAT_REG;
+	v1 &= 0xffff;
+	v2 &= 0xffff;
+	kb = (v2 << 16) | v1;
+	vmap=0;
+	v2=1;
+	for (v1=0;v1<10; v1++)
+	{
+		if ((kb & keymap[v1]) == 0)
+			vmap |= v2;
+		v2 <<= 1;
+	}
+	
+	return vmap;
+}
+
+int fastboot_preboot(void)
+{
+	u32 key;
+	
+	key=board_read_keyboard();
+	
+	if (key == (KEY_CENTER|KEY_MENU))
+	{
+		return 1;
+	}
+	return 0;
+}
+
+static void board_clrscr(u32 clr)
+{
+	u32 v,i;
+	volatile u32 *p;
+	
+	p = (volatile u32 *)(CONFIG_LCD_FRAMEBUFFER);
+	v = clr;
+	for (i=0; i<(272*480/2); i++)
+		*p++ = v;
+	
+}
+
+void board_skateboard_logo(void)
+{
+	
+	unsigned short *src = (unsigned char *)skateboard_logo;
+	int x,y;
+	int xofs, yofs;
+	char c;
+	volatile unsigned short *scr;
+	board_clrscr(0xffffffff);
+	
+	xofs = 240 - 80;
+	for (y=0; y<SKATEBOARD_HEIGHT; y++)
+	{
+		scr=(volatile unsigned short *)((960*(y))+CONFIG_LCD_FRAMEBUFFER+xofs);
+		for (x=0;x<SKATEBOARD_WIDTH/4; x++)
+		{
+			c=*src++;
+			*scr++=skateboard_palette[c >> 4];
+			*scr++=skateboard_palette[c >> 4];
+			*scr++=skateboard_palette[c & 0x0f];
+			*scr++=skateboard_palette[c & 0x0f];
+		}
+	}
+}
+
 
 void board_lcd_logo(void)
 {
 	unsigned short *src = (unsigned short *)rlogo_bmp;
 	int x,y;
-	unsigned short *scr;
-	
+	volatile unsigned short *scr;
+	board_clrscr(0x6d4a6d4a);
 	for (y=0; y<50; y++)
 	{
-		scr=(unsigned short *)((960*(y+111))+0x5ffc0000+320);
+		scr=(volatile unsigned short *)((960*(y+111))+CONFIG_LCD_FRAMEBUFFER+320);
 		for (x=0;x<160; x++)
 		{
 			*scr++=*src++;
@@ -128,36 +205,30 @@ void board_lcd_logo(void)
 
 void board_lcd_init(void)
 {
-	u32 v,i;
-	u32 *p;
-	LCDWRITE(0x77100004,0x00f0c060);
-	LCDWRITE(0x77100010,0x00000000);
-	LCDWRITE(0x77100014,0x00020127);
-	LCDWRITE(0x77100018,0x000879df);
-	LCDWRITE(0x77100020,0x00010015);
-	LCDWRITE(0x77100044,0x000f010f);
-	LCDWRITE(0x77100048,0x0001fe00);
-	LCDWRITE(0x771000a0,CONFIG_LCD_FRAMEBUFFER);
-	LCDWRITE(0x771000a4,CONFIG_LCD_FRAMEBUFFER);
-	LCDWRITE(0x771000d0,0x0043fc00);
-	LCDWRITE(0x771000d4,0x0043fc00);
-	LCDWRITE(0x77100100,0x3c0);
-	LCDWRITE(0x771001a0,0x00000006);
-	LCDWRITE(0x77100130,0x03f00000);
-	LCDWRITE(0x77100100,0x000003c0);
-	LCDWRITE(0x77100140,0x00ffffff);
-	LCDWRITE(0x77100144,0x00ffffff);
-	LCDWRITE(0x77100148,0x00ffffff);
-	LCDWRITE(0x7710014c,0x00ffffff);
-	LCDWRITE(0x77100150,0x00ffffff);
-	LCDWRITE(0x77100154,0x00ffffff);
-	LCDWRITE(0x77100158,0x00ffffff);
-	LCDWRITE(0x7710015c,0x00ffffff);
-	LCDWRITE(0x77100000,0x00000393);	
-	p = (u32 *)(CONFIG_LCD_FRAMEBUFFER);
-	v = 0;
-	for (i=0; i<(272*480/2); i++)
-		*p++ = v;
+	VIDCON1_REG=0x00f0c060;
+	VIDTCON0_REG=0x00000000;
+	VIDTCON1_REG=0x00020127;
+	VIDTCON2_REG=0x000879df;
+	WINCON0_REG=0x00010015;
+	VIDOSD0B_REG=0x000f010f;
+	VIDOSD0C_REG=0x0001fe00;
+	VIDW00ADD0B0_REG=CONFIG_LCD_FRAMEBUFFER;
+	VIDW00ADD0B1_REG=CONFIG_LCD_FRAMEBUFFER;
+	VIDW00ADD1B0_REG=0x0043fc00;
+	VIDW00ADD1B1_REG=0x0043fc00;
+	VIDW00ADD2_REG=0x3c0;
+	WPALCON_REG=0x00000006;
+	VIDINTCON0_REG=0x03f00000;
+	VIDW00ADD2_REG=0x000003c0;
+	W1KEYCON0_REG=0x00ffffff;
+	W1KEYCON1_REG=0x00ffffff;
+	W2KEYCON0_REG=0x00ffffff;
+	W2KEYCON1_REG=0x00ffffff;
+	W3KEYCON0_REG=0x00ffffff;
+	W3KEYCON1_REG=0x00ffffff;
+	W4KEYCON0_REG=0x00ffffff;
+	W4KEYCON1_REG=0x00ffffff;
+	VIDCON0_REG=0x00000393;	
 	board_lcd_logo();
 }
 

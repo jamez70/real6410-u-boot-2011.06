@@ -154,6 +154,8 @@ COBJS-$(CONFIG_CMD_UBIFS) += cmd_ubifs.o
 COBJS-$(CONFIG_CMD_UNIVERSE) += cmd_universe.o
 COBJS-$(CONFIG_CMD_UNZIP) += cmd_unzip.o
 COBJS-$(CONFIG_CMD_UPUBOOT) += cmd_upuboot.o
+COBJS-$(CONFIG_CMD_READKEY) += cmd_readkey.o
+
 ifdef CONFIG_CMD_USB
 COBJS-y += cmd_usb.o
 COBJS-y += usb.o
