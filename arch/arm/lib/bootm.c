@@ -145,7 +145,10 @@ int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
 #endif
 #ifdef CONFIG_INITRD_TAG
 	if (images->rd_start && images->rd_end)
+	{
+		printf("Setting initrd tag to 0x%x 0x%x\n",images->rd_start,images->rd_end);
 		setup_initrd_tag (bd, images->rd_start, images->rd_end);
+	}
 #endif
 	setup_end_tag(bd);
 #endif

@@ -803,7 +803,7 @@ int boot_get_ramdisk (int argc, char * const argv[], bootm_headers_t *images,
 	const void	*data;
 	size_t		size;
 #endif
-
+	printf("boot_get_ramdisk entered\n");
 	*rd_start = 0;
 	*rd_end = 0;
 
@@ -996,21 +996,25 @@ int boot_get_ramdisk (int argc, char * const argv[], bootm_headers_t *images,
 				(ulong)images->legacy_hdr_os);
 
 		image_multi_getimg (images->legacy_hdr_os, 1, &rd_data, &rd_len);
+	} else {
 #ifdef CONFIG_ANDROID_BOOT_IMAGE
 		if (images->ahdr && images->ahdr->ramdisk_size) {
+			printf("android ramdisk detected\n");
 			rd_data = (unsigned long) images->ahdr;
 			rd_data += images->ahdr->page_size;
 			rd_data += ALIGN(images->ahdr->kernel_size,
 					images->ahdr->page_size);
 			rd_len = images->ahdr->ramdisk_size;
 		}
+		else
+		{
 #endif
-	} else {
 		/*
 		 * no initrd image
 		 */
 		show_boot_progress (14);
 		rd_len = rd_data = 0;
+		}
 	}
 
 	if (!rd_data) {

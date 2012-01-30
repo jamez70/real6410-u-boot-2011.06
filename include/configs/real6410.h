@@ -82,7 +82,7 @@
 
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_CMDLINE_TAG
-#define CONFIG_INITRD_TAG
+#define CONFIG_INITRD_TAG    1
 
 #define CONFIG_ZIMAGE_BOOT
 #define CONFIG_IMAGE_BOOT
@@ -209,10 +209,11 @@
 //#define CONFIG_USB_CDC
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	"loadaddr2=0x51000000\0" \
 	"bb=run setinitrdargs;tftp ${loadaddr} uImagebb;bootm ${loadaddr}\0" \
 	"upuboot=tftp ${loadaddr} u-boot-nand.bin;nand erase 0 80000;nand write ${loadaddr} 0 80000;reset\0" \
     "upkernel=tftp ${loadaddr} uImage;nand erase.part kernel;nand write ${loadaddr} kernel\0" \
-    "uprecovery=tftp ${loadaddr} uRecovery;nand erase.part recovery;nand write ${loadaddr} recovery\0" \
+    "uprecovery=tftp ${loadaddr} recovery.img;nand erase.part recovery;nand write ${loadaddr} recovery\0" \
     "fbparts=0xc0000@0x0(uboot),0x40000@0xc0000(env),0x700000@0x100000(kernel),0x800000@0x800000(recovery),0xf000000@0x1000000(system)yaffs,0x28000000@0x10000000(data)yaffs,0x8000000@0x38000000(cache)yaffs\0" \
     "mtdparts=mtdparts=nand0:0xc0000@0x0(uboot),0x40000@0xc0000(env),0x700000@0x100000(kernel),0x800000@0x800000(recovery),0xf000000@0x1000000(system),0x28000000@0x10000000(data),0x8000000@0x38000000(cache)\0" \
     "mtdids=nand0=nand0\0" \
@@ -223,9 +224,10 @@
 	"rootdevnfs=root=/dev/nfs nfsroot=${serverip}:${nfsroot}rootfstype=yaffs2\0" \
     "setnfsargs=setenv bootargs noinitrd mem=${mem} console=${cons} init=/init root=/dev/nfs nfsroot=${serverip}:${nfsroot} ${ip} ${video}\0" \
     "setinitrdargs=setenv bootargs mem=${mem} console=${cons} rdinit=/linuxrc\0" \
+	"setramdiskargs=setenv bootargs mem=${mem} console=${cons} init=/init root=/dev/ram rw\0" \
 	"setnandargs=setenv bootargs noinitrd mem=${mem} console=${cons} init=/init ${rootdevnand}\0" \
-    "initrdtftpboot=run setinitrdargs;tftp ${loadaddr} zRecovery;bootm ${loadaddr}\0" \
-    "recoveryboot=run setinitrdargs;nand read ${loadaddr} recovery;bootm ${loadaddr}\0" \
+    "initrdtftpboot=run setinitrdargs;tftp ${loadaddr2} zRecovery;bootm ${loadaddr2}\0" \
+    "recoveryboot=run setramdiskargs;nand read ${loadaddr} recovery;bootm ${loadaddr}\0" \
     "bbtftpboot=run setinitrdargs;tftp ${loadaddr} uImagebb;bootm ${loadaddr}\0" \
 	"cons=ttySAC0,115200\0" \
 	"mem=224M\0"
