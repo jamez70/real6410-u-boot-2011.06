@@ -260,11 +260,11 @@ void dm9000_hw_reset(void)
 	
 }
 /* General Purpose dm9000 reset routine */
-static void
+void
 dm9000_reset(void)
 {
 	printf("resetting DM9000\n");
-	dm9000_hw_reset();
+//	dm9000_hw_reset();
 	/* Reset DM9000,
 	   see DM9000 Application Notes V1.22 Jun 11, 2004 page 29 */
 
@@ -278,7 +278,7 @@ dm9000_reset(void)
 	DM9000_iow(DM9000_NCR, (NCR_LBK_INT_MAC | NCR_RST));
 
 	do {
-		printf("resetting the DM9000, 1st reset\n");
+//		printf("resetting the DM9000, 1st reset\n");
 		udelay(25); /* Wait at least 20 us */
 	} while (DM9000_ior(DM9000_NCR) & 1);
 
@@ -289,7 +289,7 @@ dm9000_reset(void)
 	udelay(200);
 
 	do {
-		printf("resetting the DM9000, 2nd reset\n");
+	//	printf("resetting the DM9000, 2nd reset\n");
 		udelay(25); /* Wait at least 20 us */
 	} while (DM9000_ior(DM9000_NCR) & 1);
 

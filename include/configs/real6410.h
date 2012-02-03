@@ -93,7 +93,7 @@
 
 #define BOARD_LATE_INIT
 
-#define CONFIG_CLK_400_133_66
+#define CONFIG_CLK_800_133_66
 #define CONFIG_SYNC_MODE
 
 /* Network */

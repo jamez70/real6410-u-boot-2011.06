@@ -774,6 +774,11 @@
 #define STARTUP_MDIV		400
 #define STARTUP_PDIV		6
 #define STARTUP_SDIV		1
+#elif defined(CONFIG_CLK_800_133_66)
+#define STARTUP_AMDIV       400
+#define STARTUP_MDIV        400
+#define STARTUP_PDIV        3
+#define STARTUP_SDIV        1
 #elif defined(CONFIG_CLK_400_133_66)
 #define STARTUP_AMDIV		400
 #define STARTUP_MDIV		533
@@ -792,7 +797,7 @@
 #endif
 
 #define	STARTUP_PCLKDIV		3
-#define STARTUP_HCLKX2DIV	1
+#define STARTUP_HCLKX2DIV	2
 #define STARTUP_HCLKDIV		1
 #define STARTUP_MPLLDIV		1
 #define STARTUP_APLLDIV		0

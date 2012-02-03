@@ -66,6 +66,8 @@ static inline void delay(unsigned long loops)
 #define DMACConfig3 __REG(0x7db00030)
 #define DMACConfig4 __REG(0x7dc00030)
 
+void dm9000_reset(void);
+
 static void dm9000_pre_init(void)
 {
 	SROM_BW_REG &= ~(0xf << 4);
@@ -245,6 +247,7 @@ int board_init(void)
 	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
 	board_gpio_init();
 	board_lcd_init();
+	dm9000_reset();
 	return 0;
 }
 
